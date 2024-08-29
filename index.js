@@ -43,9 +43,9 @@ app.post('/api/receive_data', (req, res) => {
         timestamp: timestamp
     });
 
-    // Limiter les entrées à 1 par jour (en conservant uniquement la plus récente)
-    if (storedData[currentDay].length > 1) {
-        storedData[currentDay].shift(); // Supprimer l'ancienne entrée pour ce jour
+    // Limiter les entrées à 7 par jour (en conservant les plus récentes)
+    if (storedData[currentDay].length > 7) {
+        storedData[currentDay].shift(); // Supprimer la plus ancienne entrée pour ce jour
     }
 
     console.log(`Données stockées pour ${currentDay}:`, storedData[currentDay]);
@@ -63,6 +63,12 @@ app.get('/api/get_data', (req, res) => {
 
     res.status(200).json(storedData[currentDay]);
 });
+
+// Démarrer le serveur
+app.listen(PORT, () => {
+    console.log(`Serveur en écoute sur le port ${PORT}`);
+});
+
 
 // Démarrer le serveur
 app.listen(PORT, () => {
