@@ -10,20 +10,21 @@ let storedData = {};
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
 
+// Endpoint pour recevoir les données du script Python
 app.post('/api/receive_data', (req, res) => {
     const { title, play_count, digg_count, comment_count, share_count, download_count, timestamp } = req.body;
 
-    // Accepter les champs vides en plus des données valides
+    // Vérifier que toutes les données nécessaires sont présentes
     if (title === undefined || play_count === undefined || digg_count === undefined || comment_count === undefined || share_count === undefined || download_count === undefined || timestamp === undefined) {
         console.error('Données manquantes:', req.body);  // Ajouter cette ligne pour déboguer
         return res.status(400).json({ error: 'Données manquantes' });
     }
 
-    // Créer un identifiant unique pour chaque vidéo (par exemple, un timestamp ou un UUID)
-    const videoId = Date.now();  // Vous pouvez améliorer cette méthode pour un identifiant plus unique
+    // Utiliser une clé constante pour écraser les anciennes données
+    const videoKey = 'latest_video';  // Clé unique pour stocker les données les plus récentes
 
-    // Stocker les données de la vidéo avec l'identifiant unique
-    storedData[videoId] = {
+    // Stocker les données de la vidéo avec la clé constante
+    storedData[videoKey] = {
         title: title || '',
         play_count: play_count || '',
         digg_count: digg_count || '',
@@ -38,8 +39,6 @@ app.post('/api/receive_data', (req, res) => {
     // Répondre avec un statut de succès
     res.status(200).json({ message: 'Données reçues et stockées avec succès' });
 });
-
-
 
 // Endpoint pour récupérer les données stockées
 app.get('/api/get_data', (req, res) => {
