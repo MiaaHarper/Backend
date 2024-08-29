@@ -4,7 +4,23 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-let storedData = []; // Stocker les données reçues ici
+// Initialiser un objet pour stocker les données pour chaque jour de la semaine
+let storedData = {
+    Lundi: [],
+    Mardi: [],
+    Mercredi: [],
+    Jeudi: [],
+    Vendredi: [],
+    Samedi: [],
+    Dimanche: []
+};
+
+// Fonction pour obtenir le jour actuel en français
+function getCurrentDay() {
+    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const today = new Date();
+    return days[today.getDay()];
+}
 
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
@@ -17,19 +33,22 @@ app.post('/api/receive_data', (req, res) => {
         return res.status(400).json({ error: 'Données manquantes' });
     }
 
-    // Ajouter les nouvelles données à la liste
-    storedData.push({
+    // Obtenir le jour actuel
+    const currentDay = getCurrentDay();
+
+    // Ajouter les nouvelles données pour le jour actuel
+    storedData[currentDay].push({
         username: username,
         followers_count: followers_count,
         timestamp: timestamp
     });
 
-    // Si nous avons 8 éléments, réinitialiser à la nouvelle entrée
-    if (storedData.length === 8) {
-        storedData = [storedData[7]]; // Conserver uniquement la dernière valeur reçue
+    // Limiter les entrées à 1 par jour (en conservant uniquement la plus récente)
+    if (storedData[currentDay].length > 1) {
+        storedData[currentDay].shift(); // Supprimer l'ancienne entrée pour ce jour
     }
 
-    console.log('Données stockées:', storedData);
+    console.log(`Données stockées pour ${currentDay}:`, storedData[currentDay]);
 
     // Répondre avec un statut de succès
     res.status(200).json({ message: 'Données reçues et stockées avec succès' });
@@ -37,14 +56,16 @@ app.post('/api/receive_data', (req, res) => {
 
 // Endpoint pour récupérer les données stockées
 app.get('/api/get_data', (req, res) => {
-    if (storedData.length === 0) {
-        return res.status(404).json({ error: 'Aucune donnée disponible' });
+    const currentDay = getCurrentDay();
+    if (storedData[currentDay].length === 0) {
+        return res.status(404).json({ error: `Aucune donnée disponible pour ${currentDay}` });
     }
 
-    res.status(200).json(storedData);
+    res.status(200).json(storedData[currentDay]);
 });
 
 // Démarrer le serveur
 app.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
+
