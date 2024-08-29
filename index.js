@@ -1,10 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-app.use(cors());
+const cors = require('cors'); // Importation du module cors
 
-const app = express();
+const app = express(); // Création de l'application express
 const PORT = process.env.PORT || 3000;
+
+app.use(cors()); // Utilisation du middleware cors
 
 // Initialiser un objet pour stocker les données des vidéos TikTok
 let storedData = {};
@@ -54,3 +55,4 @@ app.get('/api/get_data', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
+
