@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-let storedData = []; // Stocker les 7 dernières données reçues dans un tableau
+let storedData = []; // Stocker les données reçues ici
 
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
@@ -24,9 +24,9 @@ app.post('/api/receive_data', (req, res) => {
         timestamp: timestamp
     });
 
-    // Limiter la liste aux 7 dernières entrées
-    if (storedData.length > 7) {
-        storedData.shift(); // Supprimer la plus ancienne entrée si la liste dépasse 7 éléments
+    // Si nous avons 8 éléments, réinitialiser à la nouvelle entrée
+    if (storedData.length === 8) {
+        storedData = [storedData[7]]; // Conserver uniquement la dernière valeur reçue
     }
 
     console.log('Données stockées:', storedData);
