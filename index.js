@@ -4,30 +4,34 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-let storedData = []; // Stocker les données reçues
+// Initialiser un objet pour stocker les données pour chaque jour de la semaine
+let storedData = {
+    'Lundi': null,
+    'Mardi': null,
+    'Mercredi': null,
+    'Jeudi': null,
+    'Vendredi': null,
+    'Samedi': null,
+    'Dimanche': null
+};
 
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
 
 // Endpoint pour recevoir les données du script Python
 app.post('/api/receive_data', (req, res) => {
-    const { username, followers_count, timestamp } = req.body;
+    const { username, followers_count, timestamp, day } = req.body;
 
-    if (!username || !followers_count || !timestamp) {
+    if (!username || !followers_count || !timestamp || !day) {
         return res.status(400).json({ error: 'Données manquantes' });
     }
 
-    // Ajouter les nouvelles données à la liste
-    storedData.push({
+    // Mettre à jour les données pour le jour reçu
+    storedData[day] = {
         username: username,
         followers_count: followers_count,
         timestamp: timestamp
-    });
-
-    // Supprimer les 7 premières entrées si la liste dépasse 7 éléments
-    if (storedData.length > 7) {
-        storedData.splice(0, storedData.length - 1); // Conserver uniquement la dernière entrée
-    }
+    };
 
     console.log('Données stockées:', storedData);
 
@@ -37,10 +41,6 @@ app.post('/api/receive_data', (req, res) => {
 
 // Endpoint pour récupérer les données stockées
 app.get('/api/get_data', (req, res) => {
-    if (storedData.length === 0) {
-        return res.status(404).json({ error: 'Aucune donnée disponible' });
-    }
-
     res.status(200).json(storedData);
 });
 
@@ -48,3 +48,4 @@ app.get('/api/get_data', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
+
