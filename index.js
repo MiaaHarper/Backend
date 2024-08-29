@@ -10,8 +10,8 @@ let storedData = {};
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
 
-// Endpoint pour recevoir les données du script Python
 app.post('/api/receive_data', (req, res) => {
+    console.log('Données reçues:', req.body);  // Ajouter cette ligne pour déboguer
     const { title, play_count, digg_count, comment_count, share_count, download_count, timestamp } = req.body;
 
     if (!title || !play_count || !digg_count || !comment_count || !share_count || !download_count || !timestamp) {
@@ -38,6 +38,7 @@ app.post('/api/receive_data', (req, res) => {
     // Répondre avec un statut de succès
     res.status(200).json({ message: 'Données reçues et stockées avec succès' });
 });
+
 
 // Endpoint pour récupérer les données stockées
 app.get('/api/get_data', (req, res) => {
