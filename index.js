@@ -11,10 +11,10 @@ let storedData = {};
 app.use(bodyParser.json());
 
 app.post('/api/receive_data', (req, res) => {
-    console.log('Données reçues:', req.body);  // Ajouter cette ligne pour déboguer
     const { title, play_count, digg_count, comment_count, share_count, download_count, timestamp } = req.body;
 
-    if (!title || !play_count || !digg_count || !comment_count || !share_count || !download_count || !timestamp) {
+    // Accepter les champs vides en plus des données valides
+    if (title === undefined || play_count === undefined || digg_count === undefined || comment_count === undefined || share_count === undefined || download_count === undefined || timestamp === undefined) {
         console.error('Données manquantes:', req.body);  // Ajouter cette ligne pour déboguer
         return res.status(400).json({ error: 'Données manquantes' });
     }
@@ -24,13 +24,13 @@ app.post('/api/receive_data', (req, res) => {
 
     // Stocker les données de la vidéo avec l'identifiant unique
     storedData[videoId] = {
-        title,
-        play_count,
-        digg_count,
-        comment_count,
-        share_count,
-        download_count,
-        timestamp
+        title: title || '',
+        play_count: play_count || '',
+        digg_count: digg_count || '',
+        comment_count: comment_count || '',
+        share_count: share_count || '',
+        download_count: download_count || '',
+        timestamp: timestamp || ''
     };
 
     console.log('Données stockées:', storedData);
@@ -38,6 +38,7 @@ app.post('/api/receive_data', (req, res) => {
     // Répondre avec un statut de succès
     res.status(200).json({ message: 'Données reçues et stockées avec succès' });
 });
+
 
 
 // Endpoint pour récupérer les données stockées
