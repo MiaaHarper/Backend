@@ -4,40 +4,33 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialiser un objet pour stocker les données pour chaque jour de la semaine
-let storedData = {
-    'Lundi': null,
-    'Mardi': null,
-    'Mercredi': null,
-    'Jeudi': null,
-    'Vendredi': null,
-    'Samedi': null,
-    'Dimanche': null
-};
+// Initialiser un objet pour stocker les données des vidéos TikTok
+let storedData = {};
 
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
 
 // Endpoint pour recevoir les données du script Python
 app.post('/api/receive_data', (req, res) => {
-    const { username, followers_count, timestamp, day } = req.body;
+    const { title, play_count, digg_count, comment_count, share_count, download_count, timestamp } = req.body;
 
-    if (!username || !followers_count || !timestamp || !day) {
+    if (!title || !play_count || !digg_count || !comment_count || !share_count || !download_count || !timestamp) {
         console.error('Données manquantes:', req.body);  // Ajouter cette ligne pour déboguer
         return res.status(400).json({ error: 'Données manquantes' });
     }
 
-    // Vérifiez si le jour est valide
-    if (!storedData.hasOwnProperty(day)) {
-        console.error('Jour invalide:', day);  // Ajouter cette ligne pour déboguer
-        return res.status(400).json({ error: 'Jour invalide' });
-    }
+    // Créer un identifiant unique pour chaque vidéo (par exemple, un timestamp ou un UUID)
+    const videoId = Date.now();  // Vous pouvez améliorer cette méthode pour un identifiant plus unique
 
-    // Mettre à jour les données pour le jour reçu
-    storedData[day] = {
-        username: username,
-        followers_count: followers_count,
-        timestamp: timestamp
+    // Stocker les données de la vidéo avec l'identifiant unique
+    storedData[videoId] = {
+        title,
+        play_count,
+        digg_count,
+        comment_count,
+        share_count,
+        download_count,
+        timestamp
     };
 
     console.log('Données stockées:', storedData);
@@ -48,6 +41,9 @@ app.post('/api/receive_data', (req, res) => {
 
 // Endpoint pour récupérer les données stockées
 app.get('/api/get_data', (req, res) => {
+    if (Object.keys(storedData).length === 0) {
+        return res.status(404).json({ error: 'Aucune donnée disponible' });
+    }
     res.status(200).json(storedData);
 });
 
