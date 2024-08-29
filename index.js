@@ -68,10 +68,3 @@ app.get('/api/get_data', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
-
-
-// Démarrer le serveur
-app.listen(PORT, () => {
-    console.log(`Serveur en écoute sur le port ${PORT}`);
-});
-
