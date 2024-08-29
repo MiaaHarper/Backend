@@ -23,7 +23,14 @@ app.post('/api/receive_data', (req, res) => {
     const { username, followers_count, timestamp, day } = req.body;
 
     if (!username || !followers_count || !timestamp || !day) {
+        console.error('Données manquantes:', req.body);  // Ajouter cette ligne pour déboguer
         return res.status(400).json({ error: 'Données manquantes' });
+    }
+
+    // Vérifiez si le jour est valide
+    if (!storedData.hasOwnProperty(day)) {
+        console.error('Jour invalide:', day);  // Ajouter cette ligne pour déboguer
+        return res.status(400).json({ error: 'Jour invalide' });
     }
 
     // Mettre à jour les données pour le jour reçu
@@ -48,4 +55,3 @@ app.get('/api/get_data', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
-
